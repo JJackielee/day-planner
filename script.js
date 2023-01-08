@@ -1,32 +1,26 @@
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-
 
 $(document).ready(() => {
 
   var saveBtn = $('.saveBtn');
-  var cTime = dayjs().format('M/D/YYYY h:mm:ss');
+  var timeContainer = $('.timeContainer');
 
   $(function () {
-    // TODO: Add a listener for click events on the save button. This code should
-    // use the id in the containing time-block as a key to save the user input in
-    // local storage. HINT: What does `this` reference in the click listener
-    // function? How can DOM traversal be used to get the "hour-x" id of the
-    // time-block containing the button that was clicked? How might the id be
-    // useful when saving the description in local storage?
-
+   //event listener that listens to all buttons with the class .saveBtn
+   //whenever button is clicked it takes the value of whatever is in the textarea and stores the val into into local storage
+   //corresponding to the ID of that task which is the hour of the time.
     saveBtn.on("click", function(){
-      console.log("does this work?");
-      console.log($(this).parent().attr('id'));
+      localStorage.setItem($(this).parent().attr('id'),$(this).parent().children().eq(1).val())
     });
-      console.log(cTime);
-      displayTime();
+    displayTime();
+    displayTask();
+    displayDate();
 
-    // 
-
+    // displaytime function that uses jquery to get all the children nodes of parent with class timecontainer
+    // uses a forloop to loop through all the children. within the forloop it gets the id of each children.
+    // the id of each children represent the time in the planner. then uses dayjs with the method diff to see if
+    // the hour difference is positive or negative. negative means its over due, 0 means its current and positive means there's still time. 
+    // then it gives each children the appropriate present, past, future class. 
     function displayTime(){ 
-      var timeContainer = $('.timeContainer');
       for(var i = 0; i < timeContainer.children().length; i++){
         var idText = timeContainer.children().eq(i).attr('id').slice(5);
         dTime = dayjs().hour(idText).diff(dayjs(),"hours")
@@ -40,27 +34,26 @@ $(document).ready(() => {
 
       }
     }
-    // TODO: Add code to apply the past, present, or future class to each time
-    // block by comparing the id to the current hour. HINTS: How can the id
-    // attribute of each time-block be used to conditionally add or remove the
-    // past, present, and future classes? How can Day.js be used to get the
-    // current hour in 24-hour time?
+  
+    //displayText function that also cycle through the amount of children in the container with class timeContainer
+    //it takes the id of each children and looks for a localstorage data. it then use that data to display in the textarea of that children node
+    function displayTask(){
+      for(var i = 0; i < timeContainer.children().length; i++){
+        var idText = timeContainer.children().eq(i).attr('id');
+        var getTask = localStorage.getItem(idText);
+        timeContainer.children().eq(i).children().eq(1).text(getTask);
+      }
 
+    }
 
+    //grab the node with the id currentDay
+    //uses dayjs to format and display the current day at the top.
+    //using jquery method text to change the text in the html
+    function displayDate(){
+      var dayText = $('#currentDay');
+      dayText.text(dayjs().format('MMM DD, YYYY - dddd'));
 
-
-    //
-    // TODO: Add code to get any user input that was saved in localStorage and set
-    // the values of the corresponding textarea elements. HINT: How can the id
-    // attribute of each time-block be used to do this?
-
-
-
-
-    //
-    // TODO: Add code to display the current date in the header of the page.
-
-
+    }
 
   });
 });
